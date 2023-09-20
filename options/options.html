@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stand Up Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+
+  <body>
+    <form class="form">
+      <div class="standing">
+        <label>Standing Hours: </label>
+        <input id="standing-hour" type="number" min="0" max="8" />
+
+        <label>Standing Minutes: </label>
+        <input id="standing-minute" type="number" min="0" max="60" />
+      </div>
+
+      <div class="sitting">
+        <label>Sitting Hours: </label>
+        <input id="sitting-hour" type="number" min="0" max="8" />
+
+        <label>Sitting Minutes: </label>
+        <input id="sitting-minute" type="number" min="0" max="60" />
+      </div>
+    </form>
+
+    <div id="status"></div>
+    <button id="save">Save</button>
+
+    <script src="options.js"></script>
+  </body>
+</html>
