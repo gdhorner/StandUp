@@ -1,12 +1,13 @@
-// Saves options to chrome.storage
+// Set preferences and current times.
 const saveOptions = () => {
-    const standingHour = document.getElementById('standing-hour').value;
-    const standingMinute = document.getElementById('standing-minute').value;
-    const sittingHour = document.getElementById('sitting-hour').value;
-    const sittingMinute = document.getElementById('sitting-minute').value;
+    const prefStandingHour = document.getElementById('pref-standing-hour').value;
+    const prefStandingMinute = document.getElementById('pref-standing-minute').value;
+    const prefSittingHour = document.getElementById('pref-sitting-hour').value;
+    const prefSittingMinute = document.getElementById('pref-sitting-minute').value;
   
     chrome.storage.sync.set(
-      { standingHour: standingHour, standingMinute: standingMinute, sittingHour: sittingHour, sittingMinute: sittingMinute },
+      { prefStandingHour: prefStandingHour, prefStandingMinute: prefStandingMinute, prefSittingHour: prefSittingHour, prefSittingMinute: prefSittingMinute,
+        currStandingHour: prefStandingHour, currStandingMinute: prefStandingMinute, currSittingHour: prefSittingHour, currSittingMinute: prefSittingMinute },
       () => {
         // Update status to let user know options were saved.
         const status = document.getElementById('status');
@@ -18,16 +19,15 @@ const saveOptions = () => {
     );
   };
   
-  // Restores select box and checkbox state using the preferences
-  // stored in chrome.storage.
+  // Restores times using the preferences stored in chrome.storage.
   const restoreOptions = () => {
     chrome.storage.sync.get(
-      { standingHour: '', standingMinute: '', sittingHour: '', sittingMinute: ''},
+      { prefStandingHour: '', prefStandingMinute: '', prefSittingHour: '', prefSittingMinute: ''},
       (items) => {
-        document.getElementById('standing-hour').value = items.standingHour;
-        document.getElementById('standing-minute').value = items.standingMinute;
-        document.getElementById('sitting-hour').value = items.sittingHour;
-        document.getElementById('sitting-minute').value = items.sittingMinute;
+        document.getElementById('pref-standing-hour').value = items.prefStandingHour;
+        document.getElementById('pref-standing-minute').value = items.prefStandingMinute;
+        document.getElementById('pref-sitting-hour').value = items.prefSittingHour;
+        document.getElementById('pref-sitting-minute').value = items.prefSittingMinute;
       }
     );
   };

@@ -1,11 +1,25 @@
 <html>
   <head>
-    <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <h1>Ready to stand up?</h1>
-    <h2>Define your times:</h2>
-    <h2>Stand up for: </h2>
+    <div class="newUser" id="newUser"></div>
+    <div class="pre-standing-blob" id="pre-standing-blob">
+      <h1>Ready to stand up?</h1>
+      <h2>You are set to stand up for:</h2>
+      <span id="standingTime"></span>
+      <h2>Afterwards, you will be given</h2>
+      <span id="sittingTime"></span>
+      <p>If that sounds correct, then click the Stand Up button to begin!</p>
+      <button id="stand-up">Stand Up!</button>
+      <p>Otherwise, update your preferences now.</p>
+    </div>
+    <div id="current-standing-blob">
+      <h1>You got this! Every minute contributes to a healthier mind and body!</h1>
+      <h2>You have:</h2>
+      <span id="current-standing-time"></span>
+    </div>
+    <button id="end-session">End Session</button>
     <button id="go-to-options">Go to options</button>
     <script src="popup.js"></script>
   </body>
