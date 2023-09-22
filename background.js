@@ -1,6 +1,3 @@
-// Due to using the alarm now. It may make the most sense to set the initial alarm on popup, add the listener for it here to update the times.
-// and completely remove the message sending from popup -> background -> popup?
-
 let times;
 chrome.runtime.onMessage.addListener((result, sender, sendResponse) => {
     times = result;
@@ -20,9 +17,10 @@ function updateTimes(times){
     times.standingHours--;
   } 
   else{
-    // Timer is over.
+    chrome.alarms.clearAll();
+    // Somehow reset popup.html to the home view.
   }
-  console.log(times.standingHours)
+
   chrome.storage.session.set(
     { currStandingHours: times.standingHours, currStandingMinutes: times.standingMinutes },
   )

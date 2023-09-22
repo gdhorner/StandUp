@@ -1,19 +1,28 @@
-async function displaySection() {
-  const loadTimer = await chrome.storage.sync.get(["loadTimer"]);
+// Current problem is not being able to get storage values below outside of this function. So they can be reused in multiple different functions below.
 
+async function displayTimerNotActive() {
+  const {loadTimer, prefStandingMinute, prefSittingMinute } = await chrome.storage.sync.get(["loadTimer", "prefStandingMinute", "prefSittingMinute"]);
+  console.log(prefStandingMinute)
   if (loadTimer) {
     document.getElementById("pre-standing-blob").style.display = "block";
+    document.getElementById("pref-standing-time").textContent = `${prefStandingMinute} hours and ${currStandingMinutes} minutes.`;
+
   } else if (!loadTimer) {
     document.getElementById("newUser").innerHTML = "hidden";
   }
 }
 
-/*chrome.alarms.getAll((alarms) => {
+function displayTimerActive() {
+  document.getElementById("standing-blob").style.display = "block";
+}
+
+chrome.alarms.getAll((alarms) => {
   if (alarms.length === 0) {
-    displaySection();
+    displayTimerNotActive();
+  } else {
+    displayTimerActive();
   }
-});*/
-displaySection();
+});
 
 document.querySelector("#go-to-options").addEventListener("click", function () {
   if (chrome.runtime.openOptionsPage) {
@@ -23,23 +32,14 @@ document.querySelector("#go-to-options").addEventListener("click", function () {
   }
 });
 
-
-document
-  .querySelector("#stand-up")
-  .addEventListener("click", async () => {
-    const {prefStandingMinute, prefSittingMinute} = await chrome.storage.sync.get(["prefStandingMinute", "prefSittingMinute"]);
-    startTimer(prefStandingMinute, prefSittingMinute)
-  });
-
+document.querySelector("#stand-up").addEventListener("click", async () => {
+  const { prefStandingMinute, prefSittingMinute } =
+    await chrome.storage.sync.get(["prefStandingMinute", "prefSittingMinute"]);
+  startTimer(prefStandingMinute, prefSittingMinute);
+});
 
 async function startTimer(prefStandingMinute, prefSittingMinute) {
   chrome.action.setBadgeText({ text: "ON" });
-
-  let standingHours;
-  if (prefStandingMinute > 60)
-    standingHours = Math.floor(prefStandingMinute / 60);
-
-  let standingMinutes = prefStandingMinute % 60;
 
   await chrome.runtime.sendMessage({
     standingHours,
@@ -49,6 +49,10 @@ async function startTimer(prefStandingMinute, prefSittingMinute) {
   chrome.alarms.create("stand-up", {
     periodInMinutes: 0.1,
   });
+
+  document.getElementById("pre-standing-blob").style.display = "none";
+  document.getElementById("standing-blob").style.display = "block";
+
   //window.close();
 }
 
@@ -56,12 +60,19 @@ document.querySelector("#end-session").addEventListener("click", function () {
   chrome.action.setBadgeText({ text: "" });
   chrome.storage.session.clear();
   chrome.alarms.clearAll();
+
+  document.getElementById("pre-standing-blob").style.display = "block";
+  document.getElementById("standing-blob").style.display = "none";
 });
 
 chrome.storage.onChanged.addListener(async () => {
-    const {currStandingHours, currStandingMinutes} = await chrome.storage.session.get(['currStandingHours', 'currStandingMinutes'])
-    console.log(currStandingHours)
-    document.getElementById(
-      "standingTime"
-    ).textContent = `${currStandingHours} hours and ${currStandingMinutes} minutes.`;
-})
+  const { currStandingHours, currStandingMinutes } =
+    await chrome.storage.session.get([
+      "currStandingHours",
+      "currStandingMinutes",
+    ]);
+  console.log(currStandingHours);
+  document.getElementById(
+    "standing-time"
+  ).textContent = `${currStandingHours} hours and ${currStandingMinutes} minutes.`;
+});

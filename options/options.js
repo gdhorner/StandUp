@@ -1,3 +1,5 @@
+// Most likely need to set the hours and whatnot in storage here to avoid multiple calculations elsewhere.
+
 // Set preferences and current times.
 const saveOptions = () => {
     const prefStandingMinute = document.getElementById('pref-standing-minute').value;
@@ -5,7 +7,7 @@ const saveOptions = () => {
   
     chrome.storage.sync.set(
       {  prefStandingMinute: prefStandingMinute, prefSittingMinute: prefSittingMinute,
-         loadTimer: True },
+         loadTimer: true },
       () => {
         // Update status to let user know options were saved.
         const status = document.getElementById('status');
@@ -15,6 +17,12 @@ const saveOptions = () => {
         }, 750);
       }
     );
+
+    if (chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage();
+    } else {
+      window.open(chrome.runtime.getURL("options.html"));
+    }
   };
   
   // Restores times using the preferences stored in chrome.storage.

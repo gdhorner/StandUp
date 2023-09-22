@@ -4,6 +4,6 @@ html{
 }
 
 
-.newUser, .pre-standing-blob, .current-standing-blob{
+.newUser, .pre-standing-blob, .standing-blob{
     display: none;
 }
