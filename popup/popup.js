@@ -1,21 +1,15 @@
 async function getOptions() {
   let {
-    prefStandingHour,
     prefStandingMinute,
-    prefSittingHour,
     prefSittingMinute,
   } = await chrome.storage.sync.get([
-    "prefStandingHour",
     "prefStandingMinute",
-    "prefSittingHour",
     "prefSittingMinute",
   ]);
 
   let loadTimer;
   if (
-    prefStandingHour !== "" &&
     prefStandingMinute !== "" &&
-    prefSittingHour !== "" &&
     prefSittingMinute !== ""
   ) {
     loadTimer = true;
@@ -23,7 +17,19 @@ async function getOptions() {
     loadTimer = false;
   }
 
-  if (loadTimer) {
+  let standingHours;
+  if(prefStandingMinute > 60)
+    standingHours = Math.floor(prefStandingMinute / 60)
+
+  let standingMinutes = prefStandingMinute % 60
+
+  const response = await chrome.runtime.sendMessage({standingHours, standingMinutes, loadTimer})
+  chrome.alarms.create('stand-up', {
+    periodInMinutes: 1
+  })
+
+  /*if (loadTimer) {
+    document.getElementById("pre-standing-blob").style.display = "block"
     // Set timer values on the popup page.
     document.getElementById(
       "standingTime"
@@ -33,8 +39,9 @@ async function getOptions() {
     ).textContent = `${prefSittingHour} hours and ${prefSittingMinute} minutes to kick your feet up and relax.`;
   } else if (!loadTimer) {
     document.getElementById("newUser").innerHTML = "hidden";
-  }
+  }*/
 }
+
 getOptions();
 
 document.querySelector("#go-to-options").addEventListener("click", function () {

@@ -6,21 +6,15 @@
   </head>
 
   <body>
-    <form class="form">
+    <form class="form" method="post">
       <div class="standing">
-        <label>Standing Hours: </label>
-        <input id="pref-standing-hour" type="number" min="0" max="8" />
-
         <label>Standing Minutes: </label>
-        <input id="pref-standing-minute" type="number" min="0" max="60" />
+        <input name="pref-standing-minute" id="pref-standing-minute" type="number"/>
       </div>
 
       <div class="sitting">
-        <label>Sitting Hours: </label>
-        <input id="pref-sitting-hour" type="number" min="0" max="8" />
-
         <label>Sitting Minutes: </label>
-        <input id="pref-sitting-minute" type="number" min="0" max="60" />
+        <input name="pref-sitting-minute" id="pref-sitting-minute" type="number"/>
       </div>
     </form>
 

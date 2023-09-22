@@ -3,6 +3,7 @@ html{
     width: 250px;
 }
 
-.newUser{
+
+.newUser, .pre-standing-blob, .current-standing-blob{
     display: none;
 }
