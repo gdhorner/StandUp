@@ -1,48 +1,19 @@
-async function getOptions() {
-  let {
-    prefStandingMinute,
-    prefSittingMinute,
-  } = await chrome.storage.sync.get([
-    "prefStandingMinute",
-    "prefSittingMinute",
-  ]);
+async function displaySection() {
+  const loadTimer = await chrome.storage.sync.get(["loadTimer"]);
 
-  let loadTimer;
-  if (
-    prefStandingMinute !== "" &&
-    prefSittingMinute !== ""
-  ) {
-    loadTimer = true;
-  } else {
-    loadTimer = false;
-  }
-
-  let standingHours;
-  if(prefStandingMinute > 60)
-    standingHours = Math.floor(prefStandingMinute / 60)
-
-  let standingMinutes = prefStandingMinute % 60
-
-  const response = await chrome.runtime.sendMessage({standingHours, standingMinutes, loadTimer})
-  chrome.alarms.create('stand-up', {
-    periodInMinutes: 1
-  })
-
-  /*if (loadTimer) {
-    document.getElementById("pre-standing-blob").style.display = "block"
-    // Set timer values on the popup page.
-    document.getElementById(
-      "standingTime"
-    ).textContent = `${prefStandingHour} hours and ${prefStandingMinute} minutes.`;
-    document.getElementById(
-      "sittingTime"
-    ).textContent = `${prefSittingHour} hours and ${prefSittingMinute} minutes to kick your feet up and relax.`;
+  if (loadTimer) {
+    document.getElementById("pre-standing-blob").style.display = "block";
   } else if (!loadTimer) {
     document.getElementById("newUser").innerHTML = "hidden";
-  }*/
+  }
 }
 
-getOptions();
+/*chrome.alarms.getAll((alarms) => {
+  if (alarms.length === 0) {
+    displaySection();
+  }
+});*/
+displaySection();
 
 document.querySelector("#go-to-options").addEventListener("click", function () {
   if (chrome.runtime.openOptionsPage) {
@@ -52,8 +23,45 @@ document.querySelector("#go-to-options").addEventListener("click", function () {
   }
 });
 
-document.querySelector("#stand-up").addEventListener("click", function () {
+
+document
+  .querySelector("#stand-up")
+  .addEventListener("click", async () => {
+    const {prefStandingMinute, prefSittingMinute} = await chrome.storage.sync.get(["prefStandingMinute", "prefSittingMinute"]);
+    startTimer(prefStandingMinute, prefSittingMinute)
+  });
+
+
+async function startTimer(prefStandingMinute, prefSittingMinute) {
   chrome.action.setBadgeText({ text: "ON" });
-  chrome.alarms.create({ periodInMinutes: 1 });
-  window.close();
+
+  let standingHours;
+  if (prefStandingMinute > 60)
+    standingHours = Math.floor(prefStandingMinute / 60);
+
+  let standingMinutes = prefStandingMinute % 60;
+
+  await chrome.runtime.sendMessage({
+    standingHours,
+    standingMinutes,
+  });
+
+  chrome.alarms.create("stand-up", {
+    periodInMinutes: 0.1,
+  });
+  //window.close();
+}
+
+document.querySelector("#end-session").addEventListener("click", function () {
+  chrome.action.setBadgeText({ text: "" });
+  chrome.storage.session.clear();
+  chrome.alarms.clearAll();
 });
+
+chrome.storage.onChanged.addListener(async () => {
+    const {currStandingHours, currStandingMinutes} = await chrome.storage.session.get(['currStandingHours', 'currStandingMinutes'])
+    console.log(currStandingHours)
+    document.getElementById(
+      "standingTime"
+    ).textContent = `${currStandingHours} hours and ${currStandingMinutes} minutes.`;
+})

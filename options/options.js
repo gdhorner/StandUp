@@ -4,7 +4,8 @@ const saveOptions = () => {
     const prefSittingMinute = document.getElementById('pref-sitting-minute').value;
   
     chrome.storage.sync.set(
-      {  prefStandingMinute: prefStandingMinute, prefSittingMinute: prefSittingMinute },
+      {  prefStandingMinute: prefStandingMinute, prefSittingMinute: prefSittingMinute,
+         loadTimer: True },
       () => {
         // Update status to let user know options were saved.
         const status = document.getElementById('status');

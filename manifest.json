@@ -9,6 +9,14 @@
     "48": "images/standup.png",
     "128": "images/standup.png"
   },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "alarms", "notifications"],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
@@ -17,13 +25,5 @@
       "48": "images/standup.png",
       "128": "images/standup.png"
     }
-  },
-  "options_ui": {
-    "page": "options/options.html",
-    "open_in_tab": false
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "permissions": ["storage", "alarms", "notifications"]
+  }
 }
