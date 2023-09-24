@@ -1,27 +1,25 @@
-let times;
-chrome.runtime.onMessage.addListener((result, sender, sendResponse) => {
-    times = result;
-  }
-);
-
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  updateTimes(times)
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  await updateTimes()
 })
 
-function updateTimes(times){  
-  if(times.standingMinutes > 0){
-    times.standingMinutes--;
-  } else if(times.standingMinutes === 0 && times.standingHours > 1){
-    times.standingMinutes = 60
-    times.standingHours--;
+async function updateTimes(){  
+  let { currStandingHours, currStandingMinutes } =
+    await chrome.storage.session.get([
+      "currStandingHours",
+      "currStandingMinutes",
+    ]);
+  if(currStandingMinutes > 0){
+    currStandingMinutes--;
+  } else if(currStandingMinutes === 0 && currStandingHours > 1){
+    currStandingMinutes = 60
+    currStandingHours--;
   } 
   else{
     chrome.alarms.clearAll();
     // Somehow reset popup.html to the home view.
   }
 
-  chrome.storage.session.set(
-    { currStandingHours: times.standingHours, currStandingMinutes: times.standingMinutes },
+  await chrome.storage.session.set(
+    { currStandingHours: currStandingHours, currStandingMinutes: currStandingMinutes },
   )
 }

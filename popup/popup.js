@@ -1,12 +1,10 @@
-// Current problem is not being able to get storage values below outside of this function. So they can be reused in multiple different functions below.
 
 async function displayTimerNotActive() {
-  const {loadTimer, prefStandingMinute, prefSittingMinute } = await chrome.storage.sync.get(["loadTimer", "prefStandingMinute", "prefSittingMinute"]);
-  console.log(prefStandingMinute)
-  if (loadTimer) {
-    document.getElementById("pre-standing-blob").style.display = "block";
-    document.getElementById("pref-standing-time").textContent = `${prefStandingMinute} hours and ${currStandingMinutes} minutes.`;
+  const { loadTimer } = await chrome.storage.sync.get(["loadTimer"]);
 
+  if (loadTimer) {
+    await setCurrentTimes();
+    document.getElementById("pre-standing-blob").style.display = "block";
   } else if (!loadTimer) {
     document.getElementById("newUser").innerHTML = "hidden";
   }
@@ -32,19 +30,12 @@ document.querySelector("#go-to-options").addEventListener("click", function () {
   }
 });
 
-document.querySelector("#stand-up").addEventListener("click", async () => {
-  const { prefStandingMinute, prefSittingMinute } =
-    await chrome.storage.sync.get(["prefStandingMinute", "prefSittingMinute"]);
-  startTimer(prefStandingMinute, prefSittingMinute);
+document.querySelector("#stand-up").addEventListener("click", () => {
+  startTimer();
 });
 
-async function startTimer(prefStandingMinute, prefSittingMinute) {
+function startTimer() {
   chrome.action.setBadgeText({ text: "ON" });
-
-  await chrome.runtime.sendMessage({
-    standingHours,
-    standingMinutes,
-  });
 
   chrome.alarms.create("stand-up", {
     periodInMinutes: 0.1,
@@ -52,7 +43,6 @@ async function startTimer(prefStandingMinute, prefSittingMinute) {
 
   document.getElementById("pre-standing-blob").style.display = "none";
   document.getElementById("standing-blob").style.display = "block";
-
   //window.close();
 }
 
@@ -71,8 +61,34 @@ chrome.storage.onChanged.addListener(async () => {
       "currStandingHours",
       "currStandingMinutes",
     ]);
-  console.log(currStandingHours);
   document.getElementById(
     "standing-time"
   ).textContent = `${currStandingHours} hours and ${currStandingMinutes} minutes.`;
 });
+
+async function setCurrentTimes() {
+  const { prefStandingMinutes } = await chrome.storage.sync.get([
+    "prefStandingMinutes",
+  ]);
+
+  let standingHours, standingMinutes;
+  standingHours = standingMinutes = 0;
+
+  if (prefStandingMinutes > 60)
+    standingHours = Math.floor(prefStandingMinutes / 60);
+
+  standingMinutes = prefStandingMinutes % 60;
+
+  
+  document.getElementById(
+    "pref-standing-time"
+  ).textContent = `${standingHours} hours and ${standingMinutes} minutes.`;
+  document.getElementById(
+    "standing-time"
+  ).textContent = `${standingHours} hours and ${standingMinutes} minutes.`;
+
+  await chrome.storage.session.set({
+    currStandingHours: standingHours,
+    currStandingMinutes: standingMinutes,
+  });
+}
