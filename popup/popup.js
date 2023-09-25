@@ -15,8 +15,14 @@ document.querySelector("#go-to-options").addEventListener("click", function () {
   }
 });
 
-document.querySelector("#stand-up").addEventListener("click", () => {
-  startTimer();
+document.querySelector("#stand-up").addEventListener("click", async () => {
+  const response = await chrome.runtime.sendMessage("Start");
+  // do something with response here, not outside the function
+  console.log(response);
+
+  document.getElementById("pre-standing-blob").style.display = "none";
+  document.getElementById("standing-blob").style.display = "block";
+  //window.close();
 });
 
 document.querySelector("#end-session").addEventListener("click", function () {
@@ -61,20 +67,6 @@ function displayTimerActive() {
   document.getElementById("standing-blob").style.display = "block";
 }
 
-// Used to start the timer and update the display accordingly.
-function startTimer() {
-  chrome.action.setBadgeText({ text: "STND" });
-
-  chrome.alarms.create("stand-up", {
-    periodInMinutes: 0.1,
-  });
-
-  testStuff();
-
-  document.getElementById("pre-standing-blob").style.display = "none";
-  document.getElementById("standing-blob").style.display = "block";
-  //window.close();
-}
 
 // Used to set both initial and current that are displayed.
 async function setTimes() {
@@ -117,6 +109,7 @@ async function setTimes() {
     currSittingHours: sittingHours,
     currSittingMinutes: sittingMinutes
   });
+  console.log('Initial times set.')
 }
 
 //#endregion

@@ -1,33 +1,67 @@
+let isStanding;
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  await updateTimes(alarm.name);
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request === "Start") {
+    isStanding = true;
+    setTimer(isStanding);
+    sendResponse("Started.");
+  }
 });
 
-async function updateTimes(alarmName) {
-  let ttHours, ttMinutes;
-  if (alarmName === "stand-up") {
-    ttHours = "'currStandingHours'";
-    ttMinutes = "'currStandingMinutes'";
-  } else if (alarmName === "sit-down") {
-    ttHours = "'currSittingHours'";
-    ttMinutes = "'currSittingMinutes'";
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if(alarm.name === 'stand-up'){
+    isStanding = true;
+  } else if(alarm.name === 'sit-down'){
+    isStanding = false;
   }
+  await updateTimes(isStanding)
+});
 
-  let timeArr = [{ ttHours }, { ttMinutes }];
-  // generic way of getting this data doesn't seem to be working.
-  let { timeHours, timeMinutes } = await chrome.storage.session.get([
-    ttHours,
-    ttMinutes,
-  ]);
+async function updateTimes(isStanding) {
+  let type;
+  if (isStanding) {
+    type = "Standing"
+  } else if (!isStanding) {
+    type = "Sitting"
+  }
+  let tHours = "curr" + type + "Hours"
+  let tMinutes = "curr" + type + "Minutes"
 
-  console.log(timeHours);
+  let [timeHours, timeMinutes] = Object.values(await chrome.storage.session.get([tHours, tMinutes]));
+
   if (timeMinutes > 0) {
     timeMinutes--;
   } else if (timeMinutes === 0 && timeHours > 1) {
     timeMinutes = 60;
     timeHours--;
-  } else {
-    // Clear standing timer. Swap to sitting timer.
+  } 
+
+  await chrome.storage.session.set({
+    [tHours]: timeHours,
+    [tMinutes]: timeMinutes,
+  });
+
+  if(timeHours === 0 && timeMinutes === 0){
+    isStanding = !isStanding
+    console.log(isStanding)
+    setTimer(isStanding)
+    // Somehow reset popup.html to sitting view when done standing.
+    // Also when done sitting, reset everything and continue again.
+  }
+
+  testStuff();
+}
+
+function setTimer(isStanding) {
+  if (isStanding) {
+    chrome.alarms.clearAll();
+
+    chrome.alarms.create("stand-up", {
+      periodInMinutes: 0.1,
+    });
+
+    chrome.action.setBadgeText({ text: "STND" });
+  } else if (!isStanding) {
     chrome.alarms.clearAll();
 
     chrome.action.setBadgeText({ text: "SIT" });
@@ -35,12 +69,14 @@ async function updateTimes(alarmName) {
     chrome.alarms.create("sit-down", {
       periodInMinutes: 0.1,
     });
-
-    // Somehow reset popup.html to the home view.
   }
+}
 
-  await chrome.storage.session.set({
-    [{ ttHours }]: timeHours,
-    [{ ttMinutes }]: timeMinutes,
-  });
+
+async function testStuff() {
+  let alarm = await chrome.alarms.getAll();
+  console.log(alarm);
+
+  let storage = await chrome.storage.session.get();
+  console.log(storage);
 }
