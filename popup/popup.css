@@ -4,6 +4,6 @@ html{
 }
 
 
-.newUser, .pre-standing-blob, .standing-blob, .sitting-blob{
+.newUser, .standing-blob, .sitting-blob, .active-timer{
     display: none;
 }

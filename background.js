@@ -1,54 +1,58 @@
-let isStanding;
-
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request === "Start") {
-    isStanding = true;
+    // Initial start sent from the "Stand Up" button.
+    let isStanding = true;
     setTimer(isStanding);
     sendResponse("Started.");
   }
 });
 
+// Reoccurring alarm listener which will continue to update the times in the session storage.
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if(alarm.name === 'stand-up'){
+  if (alarm.name === "stand-up") {
     isStanding = true;
-  } else if(alarm.name === 'sit-down'){
+  } else if (alarm.name === "sit-down") {
     isStanding = false;
   }
-  await updateTimes(isStanding)
+  await updateTimes(isStanding);
 });
 
+// Updates the times in the session storage dynamically whether sitting or standing.
+// Once the times reach 0, reset the current times to the preferred times and start the other timer.
 async function updateTimes(isStanding) {
-  let type;
   if (isStanding) {
-    type = "Standing"
+    tHours = "currStandingHours";
+    tMinutes = "currStandingMinutes";
   } else if (!isStanding) {
-    type = "Sitting"
+    tHours = "currSittingHours";
+    tMinutes = "currSittingMinutes";
   }
-  let tHours = "curr" + type + "Hours"
-  let tMinutes = "curr" + type + "Minutes"
 
-  let [timeHours, timeMinutes] = Object.values(await chrome.storage.session.get([tHours, tMinutes]));
+  let [timeHours, timeMinutes] = Object.values(
+    await chrome.storage.session.get([tHours, tMinutes])
+  );
 
   if (timeMinutes > 0) {
     timeMinutes--;
   } else if (timeMinutes === 0 && timeHours > 1) {
     timeMinutes = 60;
     timeHours--;
-  } 
+  }
 
   await chrome.storage.session.set({
     [tHours]: timeHours,
     [tMinutes]: timeMinutes,
   });
 
-  if(timeHours === 0 && timeMinutes === 0){
-    isStanding = !isStanding
-    console.log(isStanding)
-    setTimer(isStanding)
+  if (timeHours === 0 && timeMinutes === 0) {
+    isStanding = !isStanding;
+    setTimer(isStanding);
+    const response = await chrome.runtime.sendMessage(["Reset", isStanding]);
+    console.log(response);
     // Somehow reset popup.html to sitting view when done standing.
     // Also when done sitting, reset everything and continue again.
-  }
 
+  }
   testStuff();
 }
 
@@ -71,7 +75,6 @@ function setTimer(isStanding) {
     });
   }
 }
-
 
 async function testStuff() {
   let alarm = await chrome.alarms.getAll();

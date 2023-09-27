@@ -20,6 +20,7 @@ document.querySelector("#stand-up").addEventListener("click", async () => {
   // do something with response here, not outside the function
   console.log(response);
 
+  document.getElementById("active-timer").style.display = "block";
   document.getElementById("pre-standing-blob").style.display = "none";
   document.getElementById("standing-blob").style.display = "block";
   //window.close();
@@ -30,21 +31,49 @@ document.querySelector("#end-session").addEventListener("click", function () {
   chrome.storage.session.clear();
   chrome.alarms.clearAll();
 
+  setTimes();
   document.getElementById("pre-standing-blob").style.display = "block";
-  document.getElementById("standing-blob").style.display = "none";
+  document.getElementById("active-timer").style.display = "none";
 });
 
-chrome.storage.onChanged.addListener(async () => {
-  const { currStandingHours, currStandingMinutes } =
-    await chrome.storage.session.get([
-      "currStandingHours",
-      "currStandingMinutes",
-    ]);
+chrome.storage.onChanged.addListener(async (storage) => {
+  let tHours, tMinutes, timeHours, timeMinutes;
+  timeHours = timeMinutes = 0;
+
+  let storageObj = Object.keys(storage);
+  if (storageObj.length === 1) {
+    tMinutes = storageObj[0];
+    timeMinutes = Object.values(await chrome.storage.session.get([tMinutes]));
+  } else if (storageObj.length === 2) {
+    tHours = storageObj[0];
+    tMinutes = storageObj[1];
+    [timeHours, timeMinutes] = Object.values(
+      await chrome.storage.session.get([tHours, tMinutes])
+    );
+  } else {
+    return;
+  }
+
+  let action;
+  if (tMinutes.includes("Standing")) {
+    action = "standing-time";
+  } else {
+    action = "sitting-time";
+  }
+
   document.getElementById(
-    "standing-time"
-  ).textContent = `${currStandingHours} hours and ${currStandingMinutes} minutes.`;
+    action
+  ).textContent = `${timeHours} hours and ${timeMinutes} minutes.`;
 });
 
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request[0] === "Reset") {
+    // Swap displays
+    let isStanding = request[1];
+    resetTimes(isStanding);
+    sendResponse("isStanding: " + isStanding);
+  }
+});
 
 //#region: Functions
 
@@ -54,6 +83,7 @@ async function displayTimerNotActive() {
 
   if (loadTimer) {
     // Existing preferences
+    
     await setTimes();
     document.getElementById("pre-standing-blob").style.display = "block";
   } else if (!loadTimer) {
@@ -67,26 +97,17 @@ function displayTimerActive() {
   document.getElementById("standing-blob").style.display = "block";
 }
 
-
 // Used to set both initial and current that are displayed.
 async function setTimes() {
-  const { prefStandingMinutes, prefSittingMinutes } = await chrome.storage.sync.get([
-    "prefStandingMinutes", "prefSittingMinutes",
-  ]);
+  const { prefStandingMinutes, prefSittingMinutes } =
+    await chrome.storage.sync.get([
+      "prefStandingMinutes",
+      "prefSittingMinutes",
+    ]);
 
-  let standingHours, standingMinutes, sittingHours, sittingMinutes;
-  standingHours = standingMinutes = sittingHours = sittingMinutes = 0;
+  let [standingHours, standingMinutes] = calcHours(prefStandingMinutes)
+  let [sittingHours, sittingMinutes] = calcHours(prefSittingMinutes)
 
-  if (prefStandingMinutes > 60)
-    standingHours = Math.floor(prefStandingMinutes / 60);
-
-  standingMinutes = prefStandingMinutes % 60;
-
-  if (prefSittingMinutes > 60)
-    sittingHours = Math.floor(prefSittingMinutes / 60);
-
-  sittingMinutes = prefSittingMinutes % 60;
-  
   document.getElementById(
     "pref-standing-time"
   ).textContent = `${standingHours} hours and ${standingMinutes} minutes.`;
@@ -107,13 +128,44 @@ async function setTimes() {
     currStandingHours: standingHours,
     currStandingMinutes: standingMinutes,
     currSittingHours: sittingHours,
-    currSittingMinutes: sittingMinutes
+    currSittingMinutes: sittingMinutes,
   });
-  console.log('Initial times set.')
+  console.log("Initial times set.");
+}
+
+async function resetTimes(isStanding) {
+  let actionType;
+  if (isStanding) {
+    document.getElementById("standing-blob").style.display = "block";
+    document.getElementById("sitting-blob").style.display = "none";
+    actionType = "Standing";
+  } else if (!isStanding) {
+    document.getElementById("sitting-blob").style.display = "block";
+    document.getElementById("standing-blob").style.display = "none";
+    actionType = "Sitting";
+  }
+
+  const [prefMinutes] = Object.values(await chrome.storage.sync.get(["pref" + actionType + "Minutes"]));
+
+  let [newHours, newMinutes] = calcHours(prefMinutes);
+  let newHoursType = "curr" + actionType + "Hours"
+  let newMinutesType = "curr" + actionType + "Minutes"
+
+  await chrome.storage.session.set({
+    [newHoursType]: newHours,
+    [newMinutesType]: newMinutes,
+  });
+}
+
+function calcHours(prefMinutes) {
+  let prefHours = 0;
+  if (prefMinutes > 60) prefHours = Math.floor(prefMinutes / 60);
+
+  prefMinutes = prefMinutes % 60;
+  return [prefHours, prefMinutes];
 }
 
 //#endregion
-
 async function testStuff() {
   let alarm = await chrome.alarms.getAll();
   console.log(alarm);
