@@ -37,40 +37,37 @@ document.querySelector("#end-session").addEventListener("click", function () {
 });
 
 chrome.storage.onChanged.addListener(async (storage) => {
-  let tHours, tMinutes, timeHours, timeMinutes;
-  timeHours = timeMinutes = 0;
-
   let storageObj = Object.keys(storage);
-  if (storageObj.length === 1) {
-    tMinutes = storageObj[0];
-    timeMinutes = Object.values(await chrome.storage.session.get([tMinutes]));
-  } else if (storageObj.length === 2) {
-    tHours = storageObj[0];
-    tMinutes = storageObj[1];
-    [timeHours, timeMinutes] = Object.values(
-      await chrome.storage.session.get([tHours, tMinutes])
-    );
-  } else {
+  if(storageObj.length > 2){
     return;
   }
 
-  let action;
-  if (tMinutes.includes("Standing")) {
-    action = "standing-time";
+  let tHours, tMinutes, timeHours, timeMinutes, action;
+  timeHours = timeMinutes = 0;
+
+  if(storageObj[0].includes("Standing")){
+    tHours = "currStandingHours"
+    tMinutes = "currStandingMinutes"
+    action = "standing-time"
   } else {
-    action = "sitting-time";
+    tHours = "currSittingHours"
+    tMinutes = "currSittingMinutes"
+    action = "sitting-time"
   }
+    [timeHours, timeMinutes] = Object.values(await chrome.storage.session.get([tHours, tMinutes]));
+    console.log(timeHours);
+    console.log(timeMinutes);
 
   document.getElementById(
     action
   ).textContent = `${timeHours} hours and ${timeMinutes} minutes.`;
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
   if (request[0] === "Reset") {
     // Swap displays
     let isStanding = request[1];
-    resetTimes(isStanding);
+    await resetTimes(isStanding);
     sendResponse("isStanding: " + isStanding);
   }
 });
@@ -148,6 +145,8 @@ async function resetTimes(isStanding) {
   const [prefMinutes] = Object.values(await chrome.storage.sync.get(["pref" + actionType + "Minutes"]));
 
   let [newHours, newMinutes] = calcHours(prefMinutes);
+  console.log(newHours)
+  console.log(newMinutes)
   let newHoursType = "curr" + actionType + "Hours"
   let newMinutesType = "curr" + actionType + "Minutes"
 

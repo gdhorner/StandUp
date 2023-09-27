@@ -34,8 +34,8 @@ async function updateTimes(isStanding) {
 
   if (timeMinutes > 0) {
     timeMinutes--;
-  } else if (timeMinutes === 0 && timeHours > 1) {
-    timeMinutes = 60;
+  } else if (timeMinutes === 0 && timeHours >= 1) {
+    timeMinutes = 59;
     timeHours--;
   }
 
