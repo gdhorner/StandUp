@@ -1,5 +1,6 @@
 // Determine the initial loaded html based on timer presence.
 chrome.alarms.getAll((alarms) => {
+  console.log(alarms)
   if (alarms.length === 0) {
     displayTimerNotActive();
   } else {
@@ -85,12 +86,14 @@ async function displayTimerNotActive() {
     document.getElementById("pre-standing-blob").style.display = "block";
   } else if (!loadTimer) {
     // Nonexisting preferences
-    document.getElementById("newUser").innerHTML = "hidden";
+    document.getElementById("new-user").innerHTML = "hidden";
   }
 }
 
 // Used to display html related to there being an ongoing timer.
 function displayTimerActive() {
+  document.getElementById("active-timer").style.display = "block";
+  document.getElementById("pre-standing-blob").style.display = "none";
   document.getElementById("standing-blob").style.display = "block";
 }
 
