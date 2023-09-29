@@ -1,9 +1,75 @@
+body {
+    background-color: rgb(44, 44, 44);
+    color: white;
+    padding: 6px 10px 8px 10px;
+  }
+  @media screen and (prefers-color-scheme: light) {
+    body {
+      background-color: white;
+      color: black;
+    }
+  }
+
 html{
-    height: 300px;
-    width: 300px;
+    height: 325px;
+    width: 400px;
+    
 }
 
+h2{
+    font-size: 16px;
+}
 
 .newUser, .standing-blob, .sitting-blob, .active-timer{
     display: none;
+}
+
+.pre-standing-blob{
+    display: flex;
+}
+
+.center-header{
+    text-align: center;
+}
+
+.emphasized-text{
+    color: rgb(129, 0, 250)
+}
+
+.time{
+    padding-left: 24px;
+    text-decoration: rgb(129, 0, 250) underline;
+}
+
+.stand-up{
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px;
+}
+
+button{
+    align-self: center;
+    padding: 8px 8px;
+    color: white;
+    background-color: rgb(44, 44, 44);
+    border: 2px solid rgb(129, 0, 250);
+    border-radius: 12px;
+    font-size: 16px;
+    transition-duration: 0.4s
+}
+
+button:hover{
+    background-color: white;
+    color: purple;
+}
+
+.preferences{
+    padding-top: 8px;
+}
+#go-to-options{
+    color: rgb(132, 132, 253);
+}
+
+#go-to-options:hover{
+    cursor: pointer;
 }

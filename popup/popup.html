@@ -5,14 +5,20 @@
   <body>
     <div class="new-user" id="new-user"></div>
     <div class="pre-standing-blob" id="pre-standing-blob">
-      <h1>Ready to stand up?</h1>
+      <h1 class="center-header">
+        Ready to <span class="emphasized-text">Stand</span> up?
+      </h1>
       <h2>You are set to stand up for:</h2>
-      <span id="pref-standing-time"></span>
+      <div class="time"><span id="pref-standing-time"></span></div>
       <h2>Afterwards, you will be given</h2>
-      <span id="pref-sitting-time"></span>
-      <p>If that sounds correct, then click the Stand Up button to begin!</p>
-      <button id="stand-up">Stand Up!</button>
-      <p>Otherwise, update your preferences now.</p>
+      <span class="time" id="pref-sitting-time"></span>
+      <section class="stand-up">
+        <p>
+          If that sounds correct, then click the Stand Up button to begin!
+        </p>
+        <button id="stand-up">Stand Up!</button>
+      </section>
+      <p class="preferences">Otherwise, update your <span id="go-to-options">preferences</span> now.</p>
     </div>
     <div class="active-timer" id="active-timer">
       <div class="standing-blob" id="standing-blob">
@@ -27,10 +33,8 @@
         <h2>You have:</h2>
         <span id="sitting-time"></span>
       </div>
-
       <button id="end-session">End Session</button>
     </div>
-    <button id="go-to-options">Go to options</button>
     <script src="popup.js"></script>
   </body>
 </html>
