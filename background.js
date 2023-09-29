@@ -47,13 +47,24 @@ async function updateTimes(isStanding) {
   if (timeHours === 0 && timeMinutes === 0) {
     isStanding = !isStanding;
     setTimer(isStanding);
-    const response = await chrome.runtime.sendMessage(["Reset", isStanding]);
-    console.log(response);
-    // Somehow reset popup.html to sitting view when done standing.
-    // Also when done sitting, reset everything and continue again.
+    await chrome.runtime.sendMessage(["Reset", isStanding]);
 
+    if(isStanding){
+      chrome.notifications.create('', {
+        title: 'Time to Stand Up!',
+        message: 'Embrace it!',
+        iconUrl: '/images/standup.png',
+        type: 'basic'
+      })
+    } else if(!isStanding){
+      chrome.notifications.create('', {
+        title: 'Time to Sit Down!',
+        message: 'Enjoy it!',
+        iconUrl: '/images/sitdown.png',
+        type: 'basic'
+      })
+    }
   }
-  testStuff();
 }
 
 function setTimer(isStanding) {
