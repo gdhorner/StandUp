@@ -49,20 +49,20 @@ async function updateTimes(isStanding) {
     setTimer(isStanding);
     await chrome.runtime.sendMessage(["Reset", isStanding]);
 
-    if(isStanding){
-      chrome.notifications.create('', {
-        title: 'Time to Stand Up!',
-        message: 'Embrace it!',
-        iconUrl: '/images/standup.png',
-        type: 'basic'
-      })
-    } else if(!isStanding){
-      chrome.notifications.create('', {
-        title: 'Time to Sit Down!',
-        message: 'Enjoy it!',
-        iconUrl: '/images/sitdown.png',
-        type: 'basic'
-      })
+    if (isStanding) {
+      chrome.notifications.create("", {
+        title: "Time to Stand Up!",
+        message: "Embrace it!",
+        iconUrl: "/images/standup.png",
+        type: "basic",
+      });
+    } else if (!isStanding) {
+      chrome.notifications.create("", {
+        title: "Time to Sit Down!",
+        message: "Enjoy it!",
+        iconUrl: "/images/sitdown.png",
+        type: "basic",
+      });
     }
   }
 }

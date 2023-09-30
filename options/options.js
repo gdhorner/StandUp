@@ -15,6 +15,7 @@ const saveOptions = () => {
     },
     () => {
       // Update status to let user know options were saved.
+      console.log("Preferences saved.")
       const status = document.getElementById("status");
       status.textContent = "Options saved.";
       setTimeout(() => {

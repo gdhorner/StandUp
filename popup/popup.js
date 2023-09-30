@@ -20,58 +20,68 @@ document.querySelector("#stand-up").addEventListener("click", async () => {
   // do something with response here, not outside the function
   console.log(response);
 
-  document.getElementById("active-timer").style.display = "block";
+  document.getElementById("active-timer").style.display = "flex";
+  document.getElementById("preferences").style.display = "none";
+  document.getElementById("html").style.height = "200px";
   document.getElementById("pre-standing-blob").style.display = "none";
-  document.getElementById("standing-blob").style.display = "block";
+  document.getElementById("standing-blob").style.display = "flex";
   document.getElementById("sitting-blob").style.display = "none";
   //window.close();
 });
 
-document.querySelector("#end-session").addEventListener("click", async function () {
-  await endSession();
-});
+document
+  .querySelector("#end-session")
+  .addEventListener("click", async function () {
+    await endSession();
+  });
 
 async function endSession() {
-  console.log("hello")
   chrome.action.setBadgeText({ text: "" });
   chrome.storage.session.clear();
   chrome.alarms.clearAll();
-  
+
   await setTimes();
   document.getElementById("pre-standing-blob").style.display = "block";
   document.getElementById("active-timer").style.display = "none";
+  document.getElementById("preferences").style.display = "block";
 }
 
 chrome.storage.onChanged.addListener(async (storage) => {
   let storageKeys = Object.keys(storage);
   let storageValues = Object.values(storage);
-  
   if (storageKeys.length > 2) {
     return;
   }
 
+  console.log(storageKeys[0])
   let tHours, tMinutes, timeHours, timeMinutes, action;
   timeHours = timeMinutes = 0;
 
   let isStanding;
-  if (storageKeys[0].includes("Standing") && storageValues[0] !== 0) {
+  if (storageKeys[0].includes("Standing") && storageValues[0].newValue !== 0) {
     isStanding = true;
-  } else if(storageKeys[0].includes("Standing" && storageValues[0] === 0)){
+  } else if (
+    storageKeys[0].includes("Standing" && storageValues[0].newValue === 0)
+  ) {
     isStanding = false;
-  } else if(storageKeys[0].includes("Sitting" && storageValues[0] === 0)){
+  } else if (
+    storageKeys[0].includes("Sitting" && storageValues[0].newValue === 0)
+  ) {
     isStanding = true;
-  } else if(storageKeys[0].includes("Sitting" && storageValues[0] !== 0)){
+  } else if (
+    storageKeys[0].includes("Sitting" && storageValues[0].newValue !== 0)
+  ) {
     isStanding = false;
-  } else if (storageKeys[0].includes("pref")) {
+  } else if (storageKeys[0].includes("pref")) {                               
     await endSession();
     return;
-  } 
+  }
 
-  if(isStanding){
+  if (isStanding) {
     tHours = "currStandingHours";
     tMinutes = "currStandingMinutes";
     action = "standing-time";
-  } else if(!isStanding){
+  } else if (!isStanding) {
     tHours = "currSittingHours";
     tMinutes = "currSittingMinutes";
     action = "sitting-time";
@@ -83,10 +93,8 @@ chrome.storage.onChanged.addListener(async (storage) => {
   console.log(`${tHours}: ${timeHours}`);
   console.log(`${tMinutes}: ${timeMinutes}`);
 
-  let textContent = getTextContent(timeHours, timeMinutes)
-  document.getElementById(
-    action
-  ).textContent = textContent;
+  let textContent = getTextContent(timeHours, timeMinutes);
+  document.getElementById(action).textContent = textContent;
 });
 
 const handleResetTimes = async (isStanding, sendResponse) => {
@@ -113,7 +121,7 @@ async function displayInactiveTimer() {
     document.getElementById("pre-standing-blob").style.display = "block";
   } else if (!loadTimer) {
     // Nonexisting preferences
-    document.getElementById("new-user").innerHTML = "hidden";
+    document.getElementById("new-user").style.display = "block";
   }
 }
 
@@ -128,24 +136,17 @@ async function setTimes() {
   let [standingHours, standingMinutes] = calcHours(prefStandingMinutes);
   let [sittingHours, sittingMinutes] = calcHours(prefSittingMinutes);
 
-  let standingTextContent = getTextContent(standingHours, standingMinutes)
-  let sittingTextContent = getTextContent(sittingHours, sittingMinutes)
+  let standingTextContent = getTextContent(standingHours, standingMinutes);
+  let sittingTextContent = getTextContent(sittingHours, sittingMinutes);
 
-  document.getElementById(
-    "pref-standing-time"
-  ).textContent = standingTextContent;
+  document.getElementById("pref-standing-time").textContent =
+    standingTextContent;
 
-  document.getElementById(
-    "pref-sitting-time"
-  ).textContent = sittingTextContent;
+  document.getElementById("pref-sitting-time").textContent = sittingTextContent;
 
-  document.getElementById(
-    "standing-time"
-  ).textContent = standingTextContent;
+  document.getElementById("standing-time").textContent = standingTextContent;
 
-  document.getElementById(
-    "sitting-time"
-  ).textContent = sittingTextContent;
+  document.getElementById("sitting-time").textContent = sittingTextContent;
 
   await chrome.storage.session.set({
     currStandingHours: standingHours,
@@ -159,11 +160,11 @@ async function setTimes() {
 async function resetTimes(isStanding) {
   let actionType;
   if (isStanding) {
-    document.getElementById("standing-blob").style.display = "block";
+    document.getElementById("standing-blob").style.display = "flex";
     document.getElementById("sitting-blob").style.display = "none";
     actionType = "Standing";
   } else if (!isStanding) {
-    document.getElementById("sitting-blob").style.display = "block";
+    document.getElementById("sitting-blob").style.display = "flex";
     document.getElementById("standing-blob").style.display = "none";
     actionType = "Sitting";
   }
@@ -173,8 +174,7 @@ async function resetTimes(isStanding) {
   );
 
   let [newHours, newMinutes] = calcHours(prefMinutes);
-  console.log(newHours);
-  console.log(newMinutes);
+
   let newHoursType = "curr" + actionType + "Hours";
   let newMinutesType = "curr" + actionType + "Minutes";
 
@@ -212,35 +212,33 @@ async function displayActiveTimer(alarmName) {
     await chrome.storage.session.get([tHours, tMinutes])
   );
 
-  document.getElementById("active-timer").style.display = "block";
+  document.getElementById("active-timer").style.display = "flex";
+  document.getElementById("preferences").style.display = "none";
   document.getElementById("pre-standing-blob").style.display = "none";
+  document.getElementById("html").style.height = "200px";
 
-  let textContent = getTextContent(timeHours, timeMinutes)
+  let textContent = getTextContent(timeHours, timeMinutes);
   if (isStanding) {
-    document.getElementById("standing-blob").style.display = "block";
+    document.getElementById("standing-blob").style.display = "flex";
     document.getElementById("sitting-blob").style.display = "none";
-    document.getElementById(
-      "standing-time"
-    ).textContent = textContent;
+    document.getElementById("standing-time").textContent = textContent;
   } else if (!isStanding) {
-    document.getElementById("sitting-blob").style.display = "block";
+    document.getElementById("sitting-blob").style.display = "flex";
     document.getElementById("standing-blob").style.display = "none";
-    document.getElementById(
-      "sitting-time"
-    ).textContent = textContent;
+    document.getElementById("sitting-time").textContent = textContent;
   }
 }
 
-function getTextContent(timeHours, timeMinutes){
+function getTextContent(timeHours, timeMinutes) {
   let textContent;
-  if(timeHours === 1 && timeMinutes === 1){
-    textContent = `${timeHours} hour and ${timeMinutes} minute.`
-  } else if(timeHours === 1){
-    textContent = `${timeHours} hour and ${timeMinutes} minutes.`
-  } else if(timeMinutes === 1){
-    textContent = `${timeHours} hours and ${timeMinutes} minute.`
-  } else{
-    textContent = `${timeHours} hours and ${timeMinutes} minutes.`
+  if (timeHours === 1 && timeMinutes === 1) {
+    textContent = `${timeHours} hour and ${timeMinutes} minute.`;
+  } else if (timeHours === 1) {
+    textContent = `${timeHours} hour and ${timeMinutes} minutes.`;
+  } else if (timeMinutes === 1) {
+    textContent = `${timeHours} hours and ${timeMinutes} minute.`;
+  } else {
+    textContent = `${timeHours} hours and ${timeMinutes} minutes.`;
   }
 
   return textContent;

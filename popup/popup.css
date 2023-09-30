@@ -11,21 +11,24 @@ body {
   }
 
 html{
-    height: 325px;
+    height: auto;
     width: 400px;
-    
 }
 
 h2{
     font-size: 16px;
 }
 
-.newUser, .standing-blob, .sitting-blob, .active-timer{
+.new-user, .standing-blob, .sitting-blob, .active-timer, .pre-standing-blob{
     display: none;
 }
 
-.pre-standing-blob{
-    display: flex;
+.active-timer, .standing-blob, .sitting-blob{
+    flex-direction: column;
+}
+
+.standing-blob, .sitting-blob{
+    padding-bottom: 16px;
 }
 
 .center-header{

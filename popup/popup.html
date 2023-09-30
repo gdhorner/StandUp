@@ -1,40 +1,46 @@
-<html>
+<html id="html">
   <head>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <div class="new-user" id="new-user"></div>
+    <div class="new-user" id="new-user">
+      <h1>It appears you don't have any preferences set.</h1>
+    </div>
     <div class="pre-standing-blob" id="pre-standing-blob">
       <h1 class="center-header">
         Ready to <span class="emphasized-text">Stand</span> up?
       </h1>
       <h2>You are set to stand up for:</h2>
-      <div class="time"><span id="pref-standing-time"></span></div>
-      <h2>Afterwards, you will be given</h2>
+      <span class="time" id="pref-standing-time"></span>
+      <h2>Afterwards, you will sit down for:</h2>
       <span class="time" id="pref-sitting-time"></span>
       <section class="stand-up">
-        <p>
-          If that sounds correct, then click the Stand Up button to begin!
-        </p>
+        <p>If that sounds correct, then click the Stand Up button to begin!</p>
         <button id="stand-up">Stand Up!</button>
       </section>
-      <p class="preferences">Otherwise, update your <span id="go-to-options">preferences</span> now.</p>
     </div>
     <div class="active-timer" id="active-timer">
       <div class="standing-blob" id="standing-blob">
-        <h1>
-          You got this! Every minute contributes to a healthier mind and body!
-        </h1>
-        <h2>You have:</h2>
-        <span id="standing-time"></span>
+        <h2>
+          You got <span class="emphasized-text">THIS!</span> Every minute
+          contributes to a healthier mind and body!
+        </h2>
+        <h2>Keep it up for:</h2>
+        <span class="time" id="standing-time"></span>
       </div>
       <div class="sitting-blob" id="sitting-blob">
-        <h1>Take a break, but don't get too comfortable!</h1>
-        <h2>You have:</h2>
-        <span id="sitting-time"></span>
+        <h2>
+          Take a break, but don't get too
+          <span class="emphasized-text">comfortable!</span>
+        </h2>
+        <h2>You can rest for:</h2>
+        <span class="time" id="sitting-time"></span>
       </div>
       <button id="end-session">End Session</button>
     </div>
+    <p class="preferences" id="preferences">
+      Update your <span id="go-to-options">preferences</span> now.
+    </p>
     <script src="popup.js"></script>
   </body>
 </html>
