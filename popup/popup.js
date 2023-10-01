@@ -191,7 +191,7 @@ async function resetTimes(isStanding) {
 
 function calcHours(prefMinutes) {
   let prefHours = 0;
-  if (prefMinutes > 60) prefHours = Math.floor(prefMinutes / 60);
+  if (prefMinutes > 59) prefHours = Math.floor(prefMinutes / 60);
 
   prefMinutes = prefMinutes % 60;
   return [prefHours, prefMinutes];
