@@ -7,6 +7,28 @@ const saveOptions = () => {
     "pref-sitting-minutes"
   ).value;
 
+  let valid = preferencesValidation(prefStandingMinutes, prefSittingMinutes);
+  if (!valid[0] && !valid[1]) {
+    document.getElementById("pref-standing-minutes").style.border = "solid";
+    document.getElementById("pref-sitting-minutes").style.border = "solid";
+    document.getElementById("pref-standing-minutes").style.borderColor = "red";
+    document.getElementById("pref-sitting-minutes").style.borderColor = "red";
+    return;
+  } else if (!valid[0]) {
+    document.getElementById("pref-standing-minutes").style.border = "solid";
+    document.getElementById("pref-standing-minutes").style.borderColor = "red";
+    document.getElementById("pref-sitting-minutes").style.border = "none";
+    return;
+  } else if (!valid[1]) {
+    document.getElementById("pref-sitting-minutes").style.border = "solid";
+    document.getElementById("pref-sitting-minutes").style.borderColor = "red";
+    document.getElementById("pref-standing-minutes").style.border = "none";
+    return;
+  }
+
+  document.getElementById("pref-standing-minutes").style.border = "none";
+  document.getElementById("pref-sitting-minutes").style.border = "none";
+
   chrome.storage.sync.set(
     {
       prefStandingMinutes: prefStandingMinutes,
@@ -15,12 +37,12 @@ const saveOptions = () => {
     },
     () => {
       // Update status to let user know options were saved.
-      console.log("Preferences saved.")
+      console.log("Preferences saved.");
       const status = document.getElementById("status");
       status.textContent = "Options saved.";
       setTimeout(() => {
         status.textContent = "";
-      }, 750);
+      }, 1000);
     }
   );
 
@@ -46,3 +68,37 @@ const restoreOptions = () => {
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
 document.getElementById("save").addEventListener("click", saveOptions);
+
+function preferencesValidation(prefStandingMinutes, prefSittingMinutes) {
+  let standingTextContent, sittingTextContent;
+  standingTextContent = sittingTextContent = "";
+  if (prefStandingMinutes < 1) {
+    standingTextContent = "Must be greater than 0";
+  } else if (prefStandingMinutes > 90) {
+    standingTextContent =
+      "Ambitious, but lets keep it under 90 minutes at a time. (:";
+  }
+
+  if (prefSittingMinutes < 1) {
+    sittingTextContent = "Must be greater than 0";
+  } else if (prefSittingMinutes > 90) {
+    sittingTextContent =
+      "Ambitious, but lets keep it under 90 minutes at a time. (:";
+  }
+
+  document.getElementById("standing-validation").textContent =
+    standingTextContent;
+  document.getElementById("sitting-validation").textContent =
+    sittingTextContent;
+
+  let [standingValidation, sittingValidation] = [true, true];
+  if (standingTextContent !== "") {
+    standingValidation = false;
+  }
+
+  if (sittingTextContent !== "") {
+    sittingValidation = false;
+  }
+
+  return [standingValidation, sittingValidation];
+}

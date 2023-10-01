@@ -72,7 +72,7 @@ function setTimer(isStanding) {
     chrome.alarms.clearAll();
 
     chrome.alarms.create("stand-up", {
-      periodInMinutes: 0.1,
+      periodInMinutes: 1,
     });
 
     chrome.action.setBadgeText({ text: "STND" });
@@ -82,7 +82,7 @@ function setTimer(isStanding) {
     chrome.action.setBadgeText({ text: "SIT" });
 
     chrome.alarms.create("sit-down", {
-      periodInMinutes: 0.1,
+      periodInMinutes: 1,
     });
   }
 }

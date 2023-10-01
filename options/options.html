@@ -13,7 +13,11 @@
           name="pref-standing-minutes"
           id="pref-standing-minutes"
           type="number"
+          required
+          min="1"
+          max="90"
         />
+        <span id="standing-validation"></span>
       </div>
 
       <div class="sitting">
@@ -22,12 +26,18 @@
           name="pref-sitting-minutes"
           id="pref-sitting-minutes"
           type="number"
+          required
+          min="1"
+          max="90"
         />
+        <span id="sitting-validation"></span>
       </div>
     </form>
 
-    <div id="status"></div>
-    <button id="save">Save</button>
+    <div class="save">
+      <button id="save">Save</button>
+      <div id="status"></div>
+    </div>
 
     <script src="options.js"></script>
   </body>

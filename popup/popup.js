@@ -3,7 +3,13 @@ chrome.alarms.getAll(async (alarms) => {
   if (alarms.length === 0) {
     await displayInactiveTimer();
   } else {
-    await displayActiveTimer(alarms[0].name);
+    const storage = await chrome.storage.session.get();
+    // If a timer still exists from last session, but storage is empty then end the previous session.
+    if (Object.keys(storage).length === 0) {
+      await endSession();
+    } else {
+      await displayActiveTimer(alarms[0].name);
+    }
   }
 });
 
@@ -17,7 +23,6 @@ document.querySelector("#go-to-options").addEventListener("click", function () {
 
 document.querySelector("#stand-up").addEventListener("click", async () => {
   const response = await chrome.runtime.sendMessage("Start");
-  // do something with response here, not outside the function
   console.log(response);
 
   document.getElementById("active-timer").style.display = "flex";
@@ -53,7 +58,7 @@ chrome.storage.onChanged.addListener(async (storage) => {
     return;
   }
 
-  console.log(storageKeys[0])
+  console.log(storageKeys[0]);
   let tHours, tMinutes, timeHours, timeMinutes, action;
   timeHours = timeMinutes = 0;
 
@@ -72,7 +77,7 @@ chrome.storage.onChanged.addListener(async (storage) => {
     storageKeys[0].includes("Sitting" && storageValues[0].newValue !== 0)
   ) {
     isStanding = false;
-  } else if (storageKeys[0].includes("pref")) {                               
+  } else if (storageKeys[0].includes("pref")) {
     await endSession();
     return;
   }
@@ -245,6 +250,7 @@ function getTextContent(timeHours, timeMinutes) {
 }
 
 //#endregion
+testStuff();
 async function testStuff() {
   let alarm = await chrome.alarms.getAll();
   console.log(alarm);

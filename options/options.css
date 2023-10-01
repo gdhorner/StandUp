@@ -1,3 +1,17 @@
+body {
+    background-color: rgb(44, 44, 44);
+    color: white;
+    padding: 6px 10px 8px 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  html{
+    height: 150px;
+    width: 400px;
+}
+
+
 .form{
     display: flex;
     flex-direction: column;
@@ -6,4 +20,36 @@
 .standing, .sitting{
     display: flex;
     padding: 8px 8px 8px 8px;
+}
+
+button{
+    align-self: center;
+    padding: 8px 8px;
+    color: white;
+    background-color: rgb(44, 44, 44);
+    border: 2px solid rgb(129, 0, 250);
+    border-radius: 12px;
+    font-size: 16px;
+    transition-duration: 0.4s
+}
+
+button:hover{
+    background-color: white;
+    color: purple;
+}
+
+.save{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+input{
+    width: 40px;
+    margin-left: 16px;
+}
+
+span{
+    margin-left: 16px;
 }

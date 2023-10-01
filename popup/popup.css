@@ -3,12 +3,6 @@ body {
     color: white;
     padding: 6px 10px 8px 10px;
   }
-  @media screen and (prefers-color-scheme: light) {
-    body {
-      background-color: white;
-      color: black;
-    }
-  }
 
 html{
     height: auto;
